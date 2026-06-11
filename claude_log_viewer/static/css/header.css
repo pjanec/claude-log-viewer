@@ -120,6 +120,12 @@ button:active {
     font-weight: 600;
 }
 
+.auto-controls-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
 .auto-refresh {
     display: flex;
     align-items: center;
@@ -127,5 +133,15 @@ button:active {
 }
 
 .auto-refresh.active {
+    color: #4fc1ff;
+}
+
+.auto-scroll {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.auto-scroll.active {
     color: #4fc1ff;
 }

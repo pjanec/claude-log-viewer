@@ -1,6 +1,6 @@
 // Entry rendering and field selection
 
-import { allEntries, selectedFields, pendingSelectedFields, currentFilters, selectedSession, renderedEntryIds, knownFields, saveSelectedFields, setPendingSelectedFields, currentViewMode, fullFileSearchActive, fullFileSearchQuery, setFullFileSearchActive } from './state.js';
+import { allEntries, selectedFields, pendingSelectedFields, currentFilters, selectedSession, renderedEntryIds, knownFields, saveSelectedFields, setPendingSelectedFields, currentViewMode, fullFileSearchActive, fullFileSearchQuery, setFullFileSearchActive, autoScrollEnabled } from './state.js';
 import { getEntryId, getSessionColor, truncateContent, formatRelativeTime, copyToClipboard, formatNumber, formatTimestamp, getUsageClass } from './utils.js';
 import { showContentDialog, showToolDetailsDialog, showTimelinePlanDialog, showTimelineTodoDialog } from './modals.js';
 import { updateStats } from './sessions.js';
@@ -1513,7 +1513,8 @@ export function renderEntries() {
     // Create body
     const tbody = document.createElement('tbody');
 
-    filtered.forEach(entry => {
+    // Reverse iteration so newest appears at bottom (natural chronological order)
+    [...filtered].reverse().forEach(entry => {
         const row = createEntryRow(entry);
         tbody.appendChild(row);
         renderedEntryIds.add(getEntryId(entry));
@@ -1528,6 +1529,13 @@ export function renderEntries() {
     container.appendChild(tableContainer);
 
     updateStats();
+
+    // Auto-scroll to bottom (latest message) if enabled
+    // The scrollable element is the parent .content div, not entriesContainer itself
+    if (autoScrollEnabled) {
+        const scrollContainer = container.parentElement;
+        scrollContainer.scrollTop = scrollContainer.scrollHeight;
+    }
 }
 
 /**

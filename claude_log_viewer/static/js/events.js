@@ -1,6 +1,6 @@
 // Event handlers and listeners
 
-import { autoRefreshInterval, selectedFields, currentViewMode, selectedSession, setAutoRefreshInterval, setPendingSelectedFields, applyPendingFields, setCurrentViewMode } from './state.js';
+import { autoRefreshInterval, autoScrollEnabled, selectedFields, currentViewMode, selectedSession, setAutoRefreshInterval, setAutoScrollEnabled, setPendingSelectedFields, applyPendingFields, setCurrentViewMode } from './state.js';
 import { loadEntries } from './api.js';
 import { renderEntries, renderFieldSelector, renderColumnPreview } from './entries.js';
 
@@ -92,6 +92,18 @@ export function toggleAutoRefresh() {
     }
 }
 
+export function toggleAutoScroll() {
+    const checkbox = document.getElementById('autoScrollCheck');
+    const container = document.getElementById('autoScroll');
+    setAutoScrollEnabled(checkbox.checked);
+
+    if (checkbox.checked) {
+        container.classList.add('active');
+    } else {
+        container.classList.remove('active');
+    }
+}
+
 export function updateAutoRefreshInterval() {
     const checkbox = document.getElementById('autoRefreshCheck');
     if (checkbox.checked) {
@@ -143,6 +155,7 @@ export function initializeEventListeners() {
     document.getElementById('typeFilter').addEventListener('change', loadWithFilters);
     document.getElementById('limitSelect').addEventListener('change', loadWithFilters);
     document.getElementById('autoRefreshCheck').addEventListener('change', toggleAutoRefresh);
+    document.getElementById('autoScrollCheck').addEventListener('change', toggleAutoScroll);
     document.getElementById('refreshInterval').addEventListener('change', updateAutoRefreshInterval);
 
     // View toggle listener

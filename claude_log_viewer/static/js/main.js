@@ -2,7 +2,7 @@
 
 import { loadEntries } from './api.js';
 import { startUsagePolling } from './usage.js';
-import { initializeEventListeners, toggleAutoRefresh } from './events.js';
+import { initializeEventListeners, toggleAutoRefresh, toggleAutoScroll } from './events.js';
 import { initializeModalListeners } from './modals.js';
 import './settings.js';  // Initialize settings module
 
@@ -21,4 +21,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Enable auto-refresh by default
     document.getElementById('autoRefreshCheck').checked = true;
     toggleAutoRefresh();
+
+    // Enable auto-scroll by default
+    document.getElementById('autoScrollCheck').checked = true;
+    toggleAutoScroll();
 });

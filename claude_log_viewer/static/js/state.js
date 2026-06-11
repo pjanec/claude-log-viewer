@@ -36,6 +36,7 @@ export let usageRefreshInterval = null; // Interval for usage polling
 export let currentViewMode = 'table'; // Current view mode: 'table' or 'timeline'
 export let fullFileSearchActive = false; // Track if we're showing full file search results
 export let fullFileSearchQuery = ''; // Track the query for full file search
+export let autoScrollEnabled = true; // Auto-scroll to latest message on refresh
 
 // Setter functions to update state from other modules
 export function setAllEntries(entries) {
@@ -44,6 +45,10 @@ export function setAllEntries(entries) {
 
 export function setAutoRefreshInterval(interval) {
     autoRefreshInterval = interval;
+}
+
+export function setAutoScrollEnabled(enabled) {
+    autoScrollEnabled = enabled;
 }
 
 export function setKnownFields(fields) {
