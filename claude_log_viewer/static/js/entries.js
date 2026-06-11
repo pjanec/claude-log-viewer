@@ -9,6 +9,18 @@ import { loadTimelineGraph, loadEntries } from './api.js';
 // Cache for field examples (performance optimization)
 let fieldExamplesCache = new Map();
 
+// Shared markdown-it renderer for table cells
+const md = window.markdownit({
+    highlight: function (str, lang) {
+        if (lang && hljs.getLanguage(lang)) {
+            try {
+                return hljs.highlight(str, { language: lang }).value;
+            } catch (__) {}
+        }
+        return '';
+    }
+});
+
 // Build field examples cache in a single pass through entries
 function buildFieldExamplesCache() {
     fieldExamplesCache.clear();
@@ -262,18 +274,7 @@ function createFieldCheckbox(field, example) {
                 expandedDiv = document.createElement('div');
                 expandedDiv.className = 'field-example-expanded';
 
-                // Render as markdown
-                const md = window.markdownit({
-                    highlight: function (str, lang) {
-                        if (lang && hljs.getLanguage(lang)) {
-                            try {
-                                return hljs.highlight(str, { language: lang }).value;
-                            } catch (__) {}
-                        }
-                        return '';
-                    }
-                });
-
+                // Render as markdown (uses shared md instance)
                 try {
                     expandedDiv.innerHTML = md.render(example.full);
                 } catch (e) {
@@ -517,45 +518,29 @@ function createEntryRow(entry) {
                 div.className = 'cell-text';
 
                 const originalText = String(fieldValue || '-');
-                const truncatedText = truncateContent(originalText);
 
                 // Check if content has tool indicators and entry has tool_items data
                 const hasToolIndicators = originalText.includes('🔧') || originalText.includes('✓');
                 const hasToolItems = entry.tool_items &&
                     (entry.tool_items.tool_uses?.length > 0 || entry.tool_items.tool_results?.length > 0);
 
-                if (truncatedText !== originalText) {
-                    // Text was truncated, make it clickable to open in modal
-                    div.classList.add('truncated');
-                    div.textContent = truncatedText;
-
-                    const indicator = document.createElement('span');
-                    indicator.className = 'expand-indicator';
-                    indicator.textContent = '▼ click to view';
-                    div.appendChild(indicator);
-
-                    // Open modal dialog on click
-                    div.addEventListener('click', (e) => {
-                        e.stopPropagation(); // Prevent copy-to-clipboard handler
-                        showContentDialog(originalText);
-                    });
-                } else if (hasToolIndicators && hasToolItems) {
-                    // Content has tool uses/results, make it clickable to show JSON
+                if (hasToolIndicators && hasToolItems) {
+                    // Content has tool uses/results, render markdown + link to JSON details
                     div.classList.add('has-tools');
-                    div.textContent = originalText;
+                    div.innerHTML = md.render(originalText);
 
                     const indicator = document.createElement('span');
                     indicator.className = 'expand-indicator';
                     indicator.textContent = '▼ view details';
                     div.appendChild(indicator);
 
-                    // Open modal with tool JSON on click
                     div.addEventListener('click', (e) => {
-                        e.stopPropagation(); // Prevent copy-to-clipboard handler
+                        e.stopPropagation();
                         showToolDetailsDialog(entry);
                     });
                 } else {
-                    div.textContent = originalText;
+                    // Full markdown rendering, no truncation
+                    div.innerHTML = md.render(originalText);
                 }
 
                 td.appendChild(div);
