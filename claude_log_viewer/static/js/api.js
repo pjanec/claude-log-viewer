@@ -12,7 +12,7 @@ export async function loadEntries(filters = {}) {
         const params = new URLSearchParams();
         if (filters.q) params.set('q', filters.q);
         if (filters.type) params.set('type', filters.type);
-        if (filters.session) params.set('session', filters.session);
+        // Session filter is applied client-side so cards remain visible
         if (filters.limit) params.set('limit', filters.limit);
         if (filters.file) params.set('file', filters.file);
 

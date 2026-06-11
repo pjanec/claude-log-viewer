@@ -1454,8 +1454,11 @@ export function renderEntries() {
     const hasFileFilter = searchTerm.startsWith('file:');
     const hasSearchQuery = searchTerm && !hasFileFilter;
 
-    // Server already filtered - just render what we have
-    const filtered = allEntries;
+    // Apply client-side session filter (so session cards stay visible)
+    let filtered = allEntries;
+    if (selectedSession) {
+        filtered = allEntries.filter(e => e.sessionId === selectedSession);
+    }
 
     // Check view mode and render accordingly
     if (currentViewMode === 'timeline') {

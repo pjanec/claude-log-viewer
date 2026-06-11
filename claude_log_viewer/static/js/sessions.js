@@ -205,34 +205,6 @@ export function renderSessionSummary() {
             ` : '';
 
             card.innerHTML = `
-                <div class="session-icon-actions">
-                    <div class="session-icon-btn" data-action="filter" title="Toggle filter">
-                        <div class="icon">🔍</div>
-                        <div class="label">Filter</div>
-                    </div>
-                    ${session.hasPlans ? `
-                    <div class="session-icon-btn" data-action="plans" title="View plans">
-                        <div class="icon">📋</div>
-                        <div class="label">Plans</div>
-                    </div>
-                    ` : ''}
-                    ${session.hasTodos ? `
-                    <div class="session-icon-btn" data-action="todos" title="View todos">
-                        <div class="icon">☑</div>
-                        <div class="label">Todos</div>
-                    </div>
-                    ` : ''}
-                    ${session.hasTimeline ? `
-                    <div class="session-icon-btn" data-action="timeline" title="View timeline">
-                        <div class="icon">📊</div>
-                        <div class="label">Timeline</div>
-                    </div>
-                    ` : ''}
-                    <div class="session-icon-btn" data-action="checkpoint" title="Create checkpoint">
-                        <div class="icon">💾</div>
-                        <div class="label">Save</div>
-                    </div>
-                </div>
                 <div class="session-id">
                     <span class="session-color-badge" style="background: ${color}; color: #fff;">
                         ${session.id.substring(0, 8)}
@@ -258,71 +230,23 @@ export function renderSessionSummary() {
                 </div>
             `;
 
-            // Add icon action handlers
-            const iconButtons = card.querySelectorAll('.session-icon-btn');
-            iconButtons.forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const action = btn.dataset.action;
-
-                    if (action === 'filter') {
-                        // Toggle filter
-                        if (selectedSession === session.id) {
-                            setSelectedSession(null);
-                        } else {
-                            setSelectedSession(session.id);
-                        }
-
-                        // Update selected state and filter button active state on all cards
-                        container.querySelectorAll('.session-card').forEach(c => {
-                            if (c.dataset.sessionId === selectedSession) {
-                                c.classList.add('selected');
-                                c.querySelector('[data-action="filter"]')?.classList.add('active');
-                            } else {
-                                c.classList.remove('selected');
-                                c.querySelector('[data-action="filter"]')?.classList.remove('active');
-                            }
-                        });
-
-                        // Import renderEntries dynamically to avoid circular dependency
-                        import('./entries.js').then(module => module.renderEntries());
-                    } else if (action === 'plans') {
-                        showPlanDialog(session);
-                    } else if (action === 'todos') {
-                        showTodoDialog(session);
-                    } else if (action === 'timeline') {
-                        // Switch to timeline view and filter to this session
-                        setSelectedSession(session.id);
-                        setCurrentViewMode('timeline');
-
-                        // Update filter button active state
-                        container.querySelectorAll('.session-card').forEach(c => {
-                            if (c.dataset.sessionId === session.id) {
-                                c.classList.add('selected');
-                                c.querySelector('[data-action="filter"]')?.classList.add('active');
-                            } else {
-                                c.classList.remove('selected');
-                                c.querySelector('[data-action="filter"]')?.classList.remove('active');
-                            }
-                        });
-
-                        // Render timeline view
-                        import('./entries.js').then(module => module.renderEntries());
-                    } else if (action === 'checkpoint') {
-                        // Create checkpoint for this session
-                        createCheckpoint(session.id, btn);
-                    }
-                });
+            // Card click = toggle session filter (radio-button behavior)
+            card.addEventListener('click', () => {
+                if (selectedSession === session.id) {
+                    // Deselect (show all)
+                    setSelectedSession(null);
+                } else {
+                    // Select this session
+                    setSelectedSession(session.id);
+                }
+                updateCardStates(container);
+                import('./entries.js').then(module => module.renderEntries());
             });
-
-            // Set initial active state for filter button if this session is selected
-            if (selectedSession === session.id) {
-                card.querySelector('[data-action="filter"]')?.classList.add('active');
-            }
 
             container.appendChild(card);
         });
 
+        updateCardStates(container);
         setLastSessionStats(currentSessions);
     } else {
         // Incremental update - only update changed stats
@@ -360,8 +284,24 @@ export function renderSessionSummary() {
             }
         });
 
+        updateCardStates(container);
         setLastSessionStats(currentSessions);
     }
+}
+
+// Update card active/inactive states based on selectedSession
+function updateCardStates(container) {
+    container.querySelectorAll('.session-card').forEach(card => {
+        if (selectedSession && card.dataset.sessionId !== selectedSession) {
+            card.classList.add('inactive');
+            card.classList.remove('selected');
+        } else if (card.dataset.sessionId === selectedSession) {
+            card.classList.add('selected');
+            card.classList.remove('inactive');
+        } else {
+            card.classList.remove('selected', 'inactive');
+        }
+    });
 }
 
 // Update stats display
