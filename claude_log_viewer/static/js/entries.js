@@ -1,6 +1,6 @@
 // Entry rendering and field selection
 
-import { allEntries, selectedFields, pendingSelectedFields, currentFilters, selectedSession, renderedEntryIds, knownFields, saveSelectedFields, setPendingSelectedFields, currentViewMode, fullFileSearchActive, fullFileSearchQuery, setFullFileSearchActive, autoScrollEnabled } from './state.js';
+import { allEntries, selectedFields, pendingSelectedFields, currentFilters, selectedSession, renderedEntryIds, knownFields, saveSelectedFields, setPendingSelectedFields, currentViewMode, fullFileSearchActive, fullFileSearchQuery, setFullFileSearchActive, autoScrollEnabled, showThoughts } from './state.js';
 import { getEntryId, getSessionColor, truncateContent, formatRelativeTime, copyToClipboard, formatNumber, formatTimestamp, getUsageClass } from './utils.js';
 import { showContentDialog, showToolDetailsDialog, showTimelinePlanDialog, showTimelineTodoDialog } from './modals.js';
 import { updateStats } from './sessions.js';
@@ -1443,6 +1443,18 @@ export function renderEntries() {
     let filtered = allEntries;
     if (selectedSession) {
         filtered = allEntries.filter(e => e.sessionId === selectedSession);
+    }
+
+    // Filter out thinking-only messages unless Thoughts checkbox is checked
+    if (!showThoughts) {
+        filtered = filtered.filter(e => {
+            const content = e.content_full;
+            if (Array.isArray(content) && content.length > 0) {
+                // Keep entry if it has any non-thinking content block
+                return content.some(c => c.type !== 'thinking');
+            }
+            return true; // Keep entries without content_full (user messages, etc.)
+        });
     }
 
     // Check view mode and render accordingly

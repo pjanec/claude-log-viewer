@@ -37,6 +37,7 @@ export let currentViewMode = 'table'; // Current view mode: 'table' or 'timeline
 export let fullFileSearchActive = false; // Track if we're showing full file search results
 export let fullFileSearchQuery = ''; // Track the query for full file search
 export let autoScrollEnabled = true; // Auto-scroll to latest message on refresh
+export let showThoughts = false; // Show thinking-only messages
 
 // Setter functions to update state from other modules
 export function setAllEntries(entries) {
@@ -49,6 +50,10 @@ export function setAutoRefreshInterval(interval) {
 
 export function setAutoScrollEnabled(enabled) {
     autoScrollEnabled = enabled;
+}
+
+export function setShowThoughts(show) {
+    showThoughts = show;
 }
 
 export function setKnownFields(fields) {

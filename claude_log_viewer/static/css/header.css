@@ -136,12 +136,14 @@ button:active {
     color: #4fc1ff;
 }
 
-.auto-scroll {
+.auto-scroll,
+.auto-thoughts {
     display: flex;
     align-items: center;
     gap: 5px;
 }
 
-.auto-scroll.active {
+.auto-scroll.active,
+.auto-thoughts.active {
     color: #4fc1ff;
 }
