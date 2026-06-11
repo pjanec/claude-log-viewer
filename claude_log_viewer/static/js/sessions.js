@@ -307,6 +307,7 @@ function updateCardStates(container) {
 // Update stats display
 export function updateStats() {
     const stats = document.getElementById('stats');
+    if (!stats) return; // Stats element was removed from HTML
     const typeFilter = document.getElementById('typeFilter').value;
     const searchTerm = document.getElementById('searchInput').value.toLowerCase();
 

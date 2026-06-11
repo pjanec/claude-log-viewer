@@ -1531,14 +1531,15 @@ export function renderEntries() {
     tableContainer.appendChild(table);
     container.appendChild(tableContainer);
 
-    updateStats();
-
     // Auto-scroll to bottom (latest message) if enabled
-    // The scrollable element is the parent .content div, not entriesContainer itself
     if (autoScrollEnabled) {
-        const scrollContainer = container.parentElement;
-        scrollContainer.scrollTop = scrollContainer.scrollHeight;
+        const scrollTarget = container.parentElement;
+        requestAnimationFrame(() => {
+            scrollTarget.scrollTop = scrollTarget.scrollHeight;
+        });
     }
+
+    updateStats();
 }
 
 /**
