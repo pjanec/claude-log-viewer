@@ -1,9 +1,13 @@
 /* Session cards, hover actions, badges */
 
+.chat-summary {
+    padding: 10px;
+}
+
 .session-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .session-card {
